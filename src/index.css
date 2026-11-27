@@ -49,6 +49,107 @@ body {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(500%);
+    opacity: 0;
+  }
+}
+
+@keyframes impactRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.85;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+@keyframes subtleShimmer {
+  0% {
+    transform: translateX(-150%);
+  }
+  50%, 100% {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes beaconPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  70%, 100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 4px rgba(163, 230, 53, 0.4));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.8));
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scanline {
+  animation: scanline 4.5s ease-in-out infinite;
+}
+
+.animate-impact-ripple {
+  animation: impactRipple 2.2s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
+}
+
+.animate-impact-ripple-delayed {
+  animation: impactRipple 2.2s cubic-bezier(0.1, 0.7, 0.3, 1) infinite 1.1s;
+}
+
+.animate-shimmer {
+  animation: subtleShimmer 4s ease-in-out infinite;
+}
+
+.animate-beacon {
+  animation: beaconPing 2s cubic-bezier(0.1, 0.6, 0.4, 1) infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
 .radar-glow {
   box-shadow: 0 0 20px rgba(246, 25, 25, 0.4);
 }

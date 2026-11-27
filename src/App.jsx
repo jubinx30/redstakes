@@ -152,13 +152,13 @@ export default function App() {
             </div>
 
             {/* Account Switcher & Sign Out Actions */}
-            <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => {
                   setShowProfileModal(false);
                   setShowAuthModal(true);
                 }}
-                className="py-2 px-3 bg-[#181c24] hover:bg-[#222733] border border-white/10 text-white font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                className="py-2.5 px-3 bg-[#181c24] hover:bg-[#222733] border border-white/10 text-white font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
                 <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Switch / Login</span>
@@ -168,19 +168,12 @@ export default function App() {
                   setUser(null);
                   setShowProfileModal(false);
                 }}
-                className="py-2 px-3 bg-[#181c24] hover:bg-red-950/40 border border-white/10 hover:border-red-500/30 text-red-400 font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                className="py-2.5 px-3 bg-[#181c24] hover:bg-red-950/40 border border-white/10 hover:border-red-500/30 text-red-400 font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Sign Out</span>
               </button>
             </div>
-
-            <button
-              onClick={() => setShowProfileModal(false)}
-              className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg cursor-pointer"
-            >
-              Close Profile
-            </button>
           </div>
         </div>
       )}

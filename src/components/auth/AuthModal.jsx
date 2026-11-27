@@ -77,30 +77,19 @@ export const DUMMY_ACCOUNTS = [
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
-  const [selectedPresetId, setSelectedPresetId] = useState('alex-reed');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
 
-  // Form states prefilled with dummy data
+  // Alex Reed's account details prefilled for client demonstration
   const [email, setEmail] = useState('alex.reed@redstakesgolf.com');
   const [password, setPassword] = useState('RedStakes2024!');
-  const [fullName, setFullName] = useState('Jordan Miller');
-  const [handicap, setHandicap] = useState('+0.8');
-  const [homeStudio, setHomeStudio] = useState('Bay 07 • Chicago Club');
+  const [fullName, setFullName] = useState('Alex Reed');
+  const [handicap, setHandicap] = useState('+1.4');
+  const [homeStudio, setHomeStudio] = useState('Bay 04 • Detroit Metro Club');
   const [rememberBay, setRememberBay] = useState(true);
 
   if (!isOpen) return null;
-
-  // Handle preset selection
-  const handleSelectPreset = (preset) => {
-    setSelectedPresetId(preset.id);
-    setEmail(preset.email);
-    setPassword(preset.password);
-    setFullName(preset.name);
-    setHandicap(preset.handicap);
-    setHomeStudio(preset.homeStudio);
-  };
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
@@ -111,27 +100,15 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
       setAuthSuccess(true);
 
       setTimeout(() => {
-        // Return authenticated user object
-        if (authMode === 'login') {
-          const matched = DUMMY_ACCOUNTS.find(a => a.email.toLowerCase() === email.toLowerCase()) || DUMMY_ACCOUNTS[0];
-          onLoginSuccess(matched);
-        } else {
-          // New registered user
-          const newUser = {
-            id: 'user-' + Date.now(),
-            name: fullName || 'New Golfer',
-            email: email,
-            handle: '@' + (fullName || 'golfer').toLowerCase().replace(/\s+/g, '_'),
-            handicap: handicap || '0.0',
-            membership: 'RSG Founder #0992',
-            avatar: '/images/lifestyle_1.png',
-            homeStudio: homeStudio || 'Bay 04 • Detroit Metro Club',
-            totalShots: '0',
-            lifetimeSoftware: true,
-            currentBag: DUMMY_ACCOUNTS[0].currentBag
-          };
-          onLoginSuccess(newUser);
-        }
+        // Return authenticated user object (Alex Reed for client demonstration)
+        const authenticatedUser = {
+          ...DUMMY_ACCOUNTS[0],
+          name: fullName || DUMMY_ACCOUNTS[0].name,
+          email: email || DUMMY_ACCOUNTS[0].email,
+          handicap: handicap || DUMMY_ACCOUNTS[0].handicap,
+          homeStudio: homeStudio || DUMMY_ACCOUNTS[0].homeStudio
+        };
+        onLoginSuccess(authenticatedUser);
         onClose();
         setAuthSuccess(false);
       }, 700);
@@ -187,38 +164,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           >
             Create Account
           </button>
-        </div>
-
-        {/* Quick-Pick Dummy Accounts Banner */}
-        <div className="mb-3 p-2.5 rounded-xl bg-[#181c24] border border-white/8 space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-mono uppercase text-gray-400 font-bold flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              1-TAP PREFILLED DUMMY ACCOUNTS
-            </span>
-            <Badge variant="lime" size="xs">READY</Badge>
-          </div>
-
-          <div className="grid grid-cols-3 gap-1.5">
-            {DUMMY_ACCOUNTS.map((acc) => {
-              const isSelected = selectedPresetId === acc.id;
-              return (
-                <button
-                  key={acc.id}
-                  type="button"
-                  onClick={() => handleSelectPreset(acc)}
-                  className={`p-1.5 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                    isSelected
-                      ? 'bg-[#f61919]/15 border-[#f61919]/50 ring-1 ring-[#f61919]/50'
-                      : 'bg-[#13171f] border-white/5 hover:border-white/20'
-                  }`}
-                >
-                  <span className="text-[10px] font-bold text-white truncate block">{acc.name.split(' ')[0]}</span>
-                  <span className="text-[8px] font-mono text-emerald-400 truncate block">HCP {acc.handicap}</span>
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Scrollable Form Body */}
@@ -350,16 +295,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 <ArrowRight className="w-3.5 h-3.5" />
               </span>
             )}
-          </button>
-
-          {/* Biometric Face ID Simulation */}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full py-2 px-3 rounded-xl bg-[#181c24] hover:bg-[#202735] border border-white/10 text-gray-300 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-          >
-            <Fingerprint className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Fast Sign In with Apple / Face ID</span>
           </button>
         </form>
 
