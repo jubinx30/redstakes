@@ -3,28 +3,28 @@ import { Wifi, Battery } from 'lucide-react';
 
 export default function IPhoneFrame({ children }) {
   return (
-    <div className="min-h-screen w-full bg-[#050608] flex items-center justify-center p-0 sm:py-6 overflow-hidden select-none">
-      {/* Outer Titanium Chassis */}
-      <div className="relative w-full max-w-[430px] h-screen sm:h-[900px] sm:max-h-[94vh] bg-[#1a1c22] sm:rounded-[54px] p-0 sm:p-[11px] shadow-[0_25px_80px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.12),inset_0_1px_3px_rgba(255,255,255,0.25)] flex flex-col transition-all">
+    <div className="min-h-screen w-full bg-[#000] flex items-center justify-center p-0 sm:py-5 overflow-hidden select-none">
+      {/* Outer White Titanium Chassis - iPhone 16 Pro Max (440 x 956 viewport) */}
+      <div className="relative w-full sm:w-[458px] h-screen sm:h-[974px] sm:max-h-[96vh] bg-[#f8f9fa] sm:rounded-[56px] p-0 sm:p-[9px] shadow-[0_25px_70px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1px_2px_rgba(255,255,255,1)] border border-[#e1e4ea] flex flex-col transition-all">
         
-        {/* Hardware Buttons (Visible on desktop / tablet wrapper) */}
+        {/* Hardware Buttons (White Titanium / Silver) */}
         {/* Action Button (Left) */}
-        <div className="hidden sm:block absolute -left-[3px] top-[115px] w-[3px] h-8 bg-[#2d3039] rounded-l-[2px] shadow-[inset_1px_0_1px_rgba(255,255,255,0.2)]" />
+        <div className="hidden sm:block absolute -left-[3.5px] top-[120px] w-[3.5px] h-9 bg-[#d8dade] rounded-l-[2px] border-r border-[#c2c5cc] shadow-[inset_1px_0_1px_rgba(255,255,255,0.9)]" />
         
         {/* Volume Up (Left) */}
-        <div className="hidden sm:block absolute -left-[3px] top-[160px] w-[3px] h-13 bg-[#2d3039] rounded-l-[2px] shadow-[inset_1px_0_1px_rgba(255,255,255,0.2)]" />
+        <div className="hidden sm:block absolute -left-[3.5px] top-[170px] w-[3.5px] h-14 bg-[#d8dade] rounded-l-[2px] border-r border-[#c2c5cc] shadow-[inset_1px_0_1px_rgba(255,255,255,0.9)]" />
         
         {/* Volume Down (Left) */}
-        <div className="hidden sm:block absolute -left-[3px] top-[225px] w-[3px] h-13 bg-[#2d3039] rounded-l-[2px] shadow-[inset_1px_0_1px_rgba(255,255,255,0.2)]" />
+        <div className="hidden sm:block absolute -left-[3.5px] top-[238px] w-[3.5px] h-14 bg-[#d8dade] rounded-l-[2px] border-r border-[#c2c5cc] shadow-[inset_1px_0_1px_rgba(255,255,255,0.9)]" />
         
         {/* Power / Siri Button (Right) */}
-        <div className="hidden sm:block absolute -right-[3px] top-[175px] w-[3px] h-16 bg-[#2d3039] rounded-r-[2px] shadow-[inset_-1px_0_1px_rgba(255,255,255,0.2)]" />
+        <div className="hidden sm:block absolute -right-[3.5px] top-[185px] w-[3.5px] h-18 bg-[#d8dade] rounded-r-[2px] border-l border-[#c2c5cc] shadow-[inset_-1px_0_1px_rgba(255,255,255,0.9)]" />
         
-        {/* Camera Control Sapphire Button (Right - iPhone 18 Pro Max signature) */}
-        <div className="hidden sm:block absolute -right-[2px] top-[305px] w-[2px] h-14 bg-[#22242b] rounded-r-[1px] border-l border-white/20" />
+        {/* Camera Control Sapphire Button (Right - iPhone 16 Pro Max signature) */}
+        <div className="hidden sm:block absolute -right-[2.5px] top-[330px] w-[2.5px] h-16 bg-[#e4e6eb] rounded-r-[1px] border border-[#c8ccd6] shadow-sm" />
 
-        {/* OLED Screen Bezel & Container */}
-        <div className="relative w-full h-full bg-[#0b0d10] text-white sm:rounded-[44px] overflow-hidden flex flex-col border border-white/10 sm:border-white/5">
+        {/* OLED Screen Bezel & Container - Ultra-thin 1.15mm Micro-Bezel */}
+        <div className="relative w-full h-full bg-[#0b0d10] text-white sm:rounded-[47px] overflow-hidden flex flex-col ring-1 ring-black/90">
           
           {/* iOS 18 Status Bar with Dynamic Island */}
           <div className="relative z-50 w-full pt-3 px-6 pb-2 flex items-center justify-between text-white text-[13px] font-semibold tracking-tight backdrop-blur-md bg-[#0b0d10]/95 select-none shrink-0 border-b border-white/5">
@@ -64,8 +64,8 @@ export default function IPhoneFrame({ children }) {
             </div>
           </div>
 
-          {/* Main App Content Viewport (Scrolls inside iPhone frame) */}
-          <div className="relative flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar pb-24">
+          {/* Main App Container */}
+          <div className="relative flex-1 w-full min-h-0 flex flex-col overflow-hidden">
             {children}
           </div>
 

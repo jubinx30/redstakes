@@ -117,6 +117,32 @@ export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onCle
         })}
       </div>
 
+      {/* Cart Quick-Access Bar (Integrated into layout - no floating) */}
+      {totalCartCount > 0 && (
+        <div className="p-3 rounded-2xl bg-[#141822] border border-white/10 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#f61919] flex items-center justify-center font-mono font-bold text-xs text-white">
+              {totalCartCount}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-white font-mono">
+                {totalCartCount} {totalCartCount === 1 ? 'Item' : 'Items'} in Bag • ${totalCartPrice.toLocaleString()}
+              </span>
+              <span className="text-[10px] text-emerald-400 font-mono">
+                Free White-Glove Freight Included
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setCheckoutModal(true)}
+            className="py-2 px-3 rounded-xl bg-[#f61919] hover:bg-[#ff3b30] text-white font-display font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(246,25,25,0.4)] active:scale-95 transition-all cursor-pointer"
+          >
+            <span>CHECKOUT</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* 4. Product Cards List */}
       <div className="space-y-4">
         {filteredProducts.map((product) => {
@@ -260,32 +286,65 @@ export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onCle
         </div>
       </div>
 
-      {/* 6. Sticky Cart Footer Bar (Fixed above bottom nav) */}
+      {/* 6. Order Summary & Checkout Section (Naturally integrated into page flow) */}
       {totalCartCount > 0 && (
-        <div className="sticky bottom-16 left-0 right-0 z-40 flex justify-center pointer-events-none px-3">
-          <div className="max-w-[430px] w-full backdrop-blur-xl bg-[#141822]/95 border border-white/15 rounded-2xl p-2.5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.8)] pointer-events-auto animate-bounce-subtle">
-            <div className="flex items-center gap-2.5 pl-1">
-              <div className="w-8 h-8 rounded-xl bg-[#f61919] flex items-center justify-center font-mono font-bold text-xs text-white">
-                {totalCartCount}
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-white font-mono">
-                  {totalCartCount} {totalCartCount === 1 ? 'Item' : 'Items'} • ${totalCartPrice.toLocaleString()}
-                </span>
-                <span className="text-[9px] text-emerald-400 font-mono">
-                  FREE WHITE-GLOVE FREIGHT INCLUDED
-                </span>
-              </div>
+        <div className="rounded-2xl border border-white/10 bg-[#13171f] p-4 flex flex-col gap-3 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-[#ff3b30]" />
+              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                CART ORDER SUMMARY
+              </span>
             </div>
-
-            <button
-              onClick={() => setCheckoutModal(true)}
-              className="py-2.5 px-4 rounded-xl bg-[#f61919] hover:bg-[#ff3b30] text-white font-display font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_16px_rgba(246,25,25,0.5)] active:scale-95 transition-all cursor-pointer"
-            >
-              <span>CHECKOUT</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <Badge variant="emerald" size="xs">
+              {totalCartCount} {totalCartCount === 1 ? 'ITEM' : 'ITEMS'} IN BAG
+            </Badge>
           </div>
+
+          <div className="divide-y divide-white/5 font-mono text-xs">
+            {cart.map((item) => (
+              <div key={item.id} className="py-2.5 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-white font-bold truncate max-w-[210px]">{item.title}</span>
+                  <span className="text-[10px] text-gray-400">${item.price.toLocaleString()} each</span>
+                </div>
+                <button
+                  onClick={() => onRemoveFromCart(item.id)}
+                  className="text-[10px] text-red-400 hover:text-red-300 underline underline-offset-2 ml-2"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#181c24] border border-white/5 space-y-1.5 font-mono text-xs">
+            <div className="flex justify-between text-gray-400">
+              <span>Subtotal:</span>
+              <span className="text-white">${totalCartPrice.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-emerald-400">
+              <span>Black Friday Special (BF20):</span>
+              <span>20% OFF INCLUDED</span>
+            </div>
+            <div className="flex justify-between text-gray-400">
+              <span>White-Glove Delivery:</span>
+              <span className="text-emerald-400 font-bold">FREE ($850 Value)</span>
+            </div>
+            <div className="pt-2 border-t border-white/10 flex justify-between font-bold text-white text-sm">
+              <span>Total Due:</span>
+              <span className="text-emerald-400 font-mono">${totalCartPrice.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setCheckoutModal(true)}
+            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#f61919] to-[#d61313] hover:from-[#ff3b30] hover:to-[#f61919] text-white font-display font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(246,25,25,0.45)] active:scale-[0.98] transition-all cursor-pointer"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>PROCEED TO CHECKOUT • ${totalCartPrice.toLocaleString()}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       )}
 

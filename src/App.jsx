@@ -6,14 +6,16 @@ import PlayStudioView from './components/views/PlayStudioView';
 import TelemetryView from './components/views/TelemetryView';
 import ArenaView from './components/views/ArenaView';
 import ProShopView from './components/views/ProShopView';
+import AuthModal from './components/auth/AuthModal';
 import { MOCK_USER, PRODUCTS } from './data/mockData';
-import { Crown, Wifi, BatteryMedium, Signal, X } from 'lucide-react';
+import { Crown, Wifi, BatteryMedium, Signal, X, LogOut, UserCheck } from 'lucide-react';
 import Badge from './components/shared/Badge';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('play'); // 'play' | 'telemetry' | 'arena' | 'shop'
   const [user, setUser] = useState(MOCK_USER);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isDynamicIslandExpanded, setIsDynamicIslandExpanded] = useState(false);
 
   // Cart state: initial item is the Flagship RSG Pro Studio Club Edition
@@ -48,45 +50,50 @@ export default function App() {
 
   return (
     <IPhoneFrame>
-      {/* Top Header inside iPhone screen */}
-      <TopHeader 
-        user={user} 
-        onOpenProfile={() => setShowProfileModal(true)} 
-      />
+      <div className="relative w-full h-full flex flex-col overflow-hidden">
+        {/* Top Header inside iPhone screen */}
+        <TopHeader 
+          user={user} 
+          onOpenProfile={() => setShowProfileModal(true)} 
+          cartCount={cartCount}
+          onOpenCheckout={() => setActiveTab('shop')}
+          onOpenAuth={() => setShowAuthModal(true)}
+        />
 
-      {/* Dynamic Main Views */}
-      <main className="w-full">
-        {activeTab === 'play' && (
-          <PlayStudioView 
-            onNavigateToTelemetry={() => setActiveTab('telemetry')}
-            onNavigateToArena={() => setActiveTab('arena')}
-          />
-        )}
+        {/* Dynamic Main Views (Scrollable) */}
+        <main className="flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar pb-28">
+          {activeTab === 'play' && (
+            <PlayStudioView 
+              onNavigateToTelemetry={() => setActiveTab('telemetry')}
+              onNavigateToArena={() => setActiveTab('arena')}
+            />
+          )}
 
-        {activeTab === 'telemetry' && (
-          <TelemetryView />
-        )}
+          {activeTab === 'telemetry' && (
+            <TelemetryView />
+          )}
 
-        {activeTab === 'arena' && (
-          <ArenaView />
-        )}
+          {activeTab === 'arena' && (
+            <ArenaView />
+          )}
 
-        {activeTab === 'shop' && (
-          <ProShopView 
-            cart={cart}
-            onAddToCart={handleAddToCart}
-            onRemoveFromCart={handleRemoveFromCart}
-            onClearCart={handleClearCart}
-          />
-        )}
-      </main>
+          {activeTab === 'shop' && (
+            <ProShopView 
+              cart={cart}
+              onAddToCart={handleAddToCart}
+              onRemoveFromCart={handleRemoveFromCart}
+              onClearCart={handleClearCart}
+            />
+          )}
+        </main>
 
-      {/* Bottom Nav inside iPhone screen */}
-      <BottomNav 
-        activeTab={activeTab} 
-        onSelectTab={setActiveTab} 
-        cartCount={cartCount}
-      />
+        {/* Bottom Nav inside iPhone screen - Anchored permanently at bottom */}
+        <BottomNav 
+          activeTab={activeTab} 
+          onSelectTab={setActiveTab} 
+          cartCount={cartCount}
+        />
+      </div>
 
       {/* Golfer Founder Profile Modal inside iPhone screen */}
       {showProfileModal && (
@@ -144,15 +151,46 @@ export default function App() {
               </div>
             </div>
 
+            {/* Account Switcher & Sign Out Actions */}
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <button
+                onClick={() => {
+                  setShowProfileModal(false);
+                  setShowAuthModal(true);
+                }}
+                className="py-2 px-3 bg-[#181c24] hover:bg-[#222733] border border-white/10 text-white font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Switch / Login</span>
+              </button>
+              <button
+                onClick={() => {
+                  setUser(null);
+                  setShowProfileModal(false);
+                }}
+                className="py-2 px-3 bg-[#181c24] hover:bg-red-950/40 border border-white/10 hover:border-red-500/30 text-red-400 font-mono text-[11px] font-bold uppercase rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+
             <button
               onClick={() => setShowProfileModal(false)}
-              className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg"
+              className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg cursor-pointer"
             >
               Close Profile
             </button>
           </div>
         </div>
       )}
+
+      {/* Auth Modal for Login & Signup with Prefilled Dummy Accounts */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
+      />
     </IPhoneFrame>
   );
 }
