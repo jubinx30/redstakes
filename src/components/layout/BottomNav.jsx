@@ -31,8 +31,8 @@ export default function BottomNav({ activeTab, onSelectTab, cartCount = 1 }) {
   ];
 
   return (
-    <nav className="fixed sm:absolute bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="w-full max-w-[458px] backdrop-blur-2xl bg-[#0b0d10]/95 border-t border-white/10 px-2 sm:px-3 pt-2 pb-3.5 sm:pb-4 flex items-center justify-around pointer-events-auto shadow-[0_-8px_30px_rgba(0,0,0,0.85)]">
+    <nav className="fixed sm:absolute bottom-3 sm:bottom-4 left-0 right-0 z-40 flex justify-center px-3 sm:px-3.5 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="w-full max-w-[424px] backdrop-blur-2xl bg-[#131722]/95 border border-white/15 rounded-2xl px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-around pointer-events-auto shadow-[0_12px_40px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.06)]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -41,7 +41,7 @@ export default function BottomNav({ activeTab, onSelectTab, cartCount = 1 }) {
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 cursor-pointer group flex-1 max-w-[84px] ${
+              className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-200 cursor-pointer group flex-1 max-w-[84px] ${
                 isActive 
                   ? 'text-[#ff3b30]' 
                   : 'text-gray-400 hover:text-gray-200'
@@ -49,7 +49,7 @@ export default function BottomNav({ activeTab, onSelectTab, cartCount = 1 }) {
             >
               {/* Active Top Glow Pill */}
               {isActive && (
-                <span className="absolute -top-2 w-8 h-1 rounded-full bg-[#f61919] shadow-[0_0_12px_#f61919]" />
+                <span className="absolute -top-1.5 sm:-top-2 w-7 sm:w-8 h-1 rounded-full bg-[#f61919] shadow-[0_0_12px_#f61919]" />
               )}
 
               {/* Icon Container with Badge */}

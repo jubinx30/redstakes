@@ -46,9 +46,9 @@ export default function IPhoneFrame({ children }) {
               {children}
             </div>
 
-            {/* iOS Home Indicator Bar - Only on desktop simulation frame */}
-            <div className="hidden sm:flex absolute bottom-1 left-0 right-0 z-50 justify-center pointer-events-none pb-1">
-              <div className="w-32 h-1 bg-white/35 rounded-full backdrop-blur-sm" />
+            {/* iOS Home Indicator Bar - Resting in bottom bezel clearance */}
+            <div className="hidden sm:flex absolute bottom-1.5 left-0 right-0 z-30 justify-center pointer-events-none">
+              <div className="w-28 h-1 bg-white/25 rounded-full backdrop-blur-sm" />
             </div>
 
           </div>

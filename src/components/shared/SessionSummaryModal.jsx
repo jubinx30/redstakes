@@ -13,6 +13,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import Badge from './Badge';
+import PhonePortal from './PhonePortal';
 
 export default function SessionSummaryModal({ 
   isOpen, 
@@ -40,8 +41,9 @@ export default function SessionSummaryModal({
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center p-3.5 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-[420px] max-h-[92vh] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left flex flex-col overflow-y-auto no-scrollbar">
+    <PhonePortal>
+      <div className="absolute inset-0 z-50 flex items-center justify-center p-3.5 bg-black/85 backdrop-blur-md animate-fade-in text-left">
+        <div className="w-full max-w-[420px] max-h-[92vh] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left flex flex-col overflow-y-auto no-scrollbar">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -187,5 +189,6 @@ export default function SessionSummaryModal({
         </div>
       </div>
     </div>
+    </PhonePortal>
   );
 }
