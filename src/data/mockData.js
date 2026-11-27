@@ -131,6 +131,117 @@ export const TELEMETRY_SHOTS = {
       duration: "1 min 10 sec",
       analysis: "Tour-grade compression and spin generation. Ball will check and bite within 3 feet of pitch mark."
     }
+  },
+  "5iron": {
+    shotNumber: 19,
+    club: "5-Iron (26.0°)",
+    shaft: "P770 • Dynamic Gold Tour Issue X100",
+    distance: "212 YD",
+    carryYardage: 206,
+    totalYardage: 212,
+    pinYardage: "210 YD (BUNKER RIGHT)",
+    flightMicroStats: {
+      apex: "112 FT",
+      curvature: "-0.4 SLIGHT DRAW",
+      offline: "0.8 L"
+    },
+    metrics: [
+      { id: "ball-speed", label: "BALL SPEED", value: "138.6", unit: "MPH", baseline: "137.0", pgaBaseline: 137, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "club-speed", label: "CLUB SPEED", value: "98.2", unit: "MPH", baseline: "97.0", pgaBaseline: 97, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "smash-factor", label: "SMASH FACTOR", value: "1.41", unit: "", baseline: "1.41", pgaBaseline: 1.41, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "spin-rate", label: "SPIN RATE", value: "5,420", unit: "RPM", baseline: "5,500", pgaBaseline: 5500, status: "IDEAL", note: "Axis: 1.1°", color: "emerald", percentage: 98 },
+      { id: "launch-angle", label: "LAUNCH ANGLE", value: "14.8", unit: "°", baseline: "14–17°", status: "IN WINDOW", color: "lime", percentage: 97 },
+      { id: "face-to-path", label: "FACE-TO-PATH", value: "-0.4", unit: "°", baseline: "0.0°", status: "SQUARE", color: "cyan", percentage: 98 },
+      { id: "attack-angle", label: "ATTACK ANGLE", value: "-3.8", unit: "°", baseline: "-3.5°", status: "DESCENDING", color: "emerald", percentage: 99 }
+    ],
+    impactRadar: {
+      point: "SWEET SPOT • FLUSH",
+      offsetX: 2,
+      offsetY: 1,
+      dynamicLoft: "21.6°",
+      faceAngle: "0.2° Closed",
+      clubPath: "0.6° In-to-Out"
+    },
+    aiCoach: {
+      score: "96%",
+      recommendation: "Hold Spine Angle",
+      duration: "1 min 25 sec",
+      analysis: "Solid long-iron compression. Clean turf interaction simulation with optimal landing descent angle of 48 degrees."
+    }
+  },
+  "pw": {
+    shotNumber: 27,
+    club: "Pitching Wedge (46.0°)",
+    shaft: "MG4 • Dynamic Gold Tour Issue S400",
+    distance: "136 YD",
+    carryYardage: 134,
+    totalYardage: 136,
+    pinYardage: "135 YD (FRONT PIN)",
+    flightMicroStats: {
+      apex: "108 FT",
+      curvature: "0.0 PIN HIGH",
+      offline: "0.2 R"
+    },
+    metrics: [
+      { id: "ball-speed", label: "BALL SPEED", value: "102.8", unit: "MPH", baseline: "102.0", pgaBaseline: 102, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "club-speed", label: "CLUB SPEED", value: "83.1", unit: "MPH", baseline: "83.0", pgaBaseline: 83, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "smash-factor", label: "SMASH FACTOR", value: "1.24", unit: "", baseline: "1.23", pgaBaseline: 1.23, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "spin-rate", label: "SPIN RATE", value: "9,250", unit: "RPM", baseline: "9,300", pgaBaseline: 9300, status: "IDEAL", note: "Axis: 0.0°", color: "emerald", percentage: 99 },
+      { id: "launch-angle", label: "LAUNCH ANGLE", value: "24.2", unit: "°", baseline: "23–26°", status: "IN WINDOW", color: "lime", percentage: 99 },
+      { id: "face-to-path", label: "FACE-TO-PATH", value: "0.0", unit: "°", baseline: "0.0°", status: "DEAD SQUARE", color: "cyan", percentage: 100 },
+      { id: "attack-angle", label: "ATTACK ANGLE", value: "-5.2", unit: "°", baseline: "-5.0°", status: "TRAPPED", color: "emerald", percentage: 98 }
+    ],
+    impactRadar: {
+      point: "DEAD CENTER SWEET SPOT",
+      offsetX: 0,
+      offsetY: 0,
+      dynamicLoft: "34.2°",
+      faceAngle: "0.0° Square",
+      clubPath: "0.0° Square"
+    },
+    aiCoach: {
+      score: "98%",
+      recommendation: "Pinch & Hold Release",
+      duration: "1 min 05 sec",
+      analysis: "Laser accurate wedge flight. Clean zip spin with rapid check-and-release pattern."
+    }
+  },
+  "56w": {
+    shotNumber: 22,
+    club: "56° Wedge (56.0°)",
+    shaft: "MG4 High Bounce • Tour Issue S400",
+    distance: "104 YD",
+    carryYardage: 102,
+    totalYardage: 104,
+    pinYardage: "105 YD (ELEVATED)",
+    flightMicroStats: {
+      apex: "96 FT",
+      curvature: "0.0 DROP & STOP",
+      offline: "0.1 L"
+    },
+    metrics: [
+      { id: "ball-speed", label: "BALL SPEED", value: "88.4", unit: "MPH", baseline: "88.0", pgaBaseline: 88, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "club-speed", label: "CLUB SPEED", value: "76.5", unit: "MPH", baseline: "76.0", pgaBaseline: 76, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "smash-factor", label: "SMASH FACTOR", value: "1.16", unit: "", baseline: "1.15", pgaBaseline: 1.15, status: "OPTIMAL", color: "emerald", percentage: 100 },
+      { id: "spin-rate", label: "SPIN RATE", value: "10,180", unit: "RPM", baseline: "10,200", pgaBaseline: 10200, status: "TOUR MAXIMUM", note: "Axis: 0.1°", color: "emerald", percentage: 100 },
+      { id: "launch-angle", label: "LAUNCH ANGLE", value: "29.8", unit: "°", baseline: "28–32°", status: "IN WINDOW", color: "lime", percentage: 98 },
+      { id: "face-to-path", label: "FACE-TO-PATH", value: "+0.1", unit: "°", baseline: "0.0°", status: "SQUARE", color: "cyan", percentage: 99 },
+      { id: "attack-angle", label: "ATTACK ANGLE", value: "-5.8", unit: "°", baseline: "-5.5°", status: "DESCENDING", color: "emerald", percentage: 99 }
+    ],
+    impactRadar: {
+      point: "GROOVE 2 • LOW SWEET SPOT",
+      offsetX: 1,
+      offsetY: -3,
+      dynamicLoft: "42.1°",
+      faceAngle: "0.1° Open",
+      clubPath: "0.1° In-to-Out"
+    },
+    aiCoach: {
+      score: "99%",
+      recommendation: "Low Flight Wedge Control",
+      duration: "1 min 15 sec",
+      analysis: "High spin generation with controlled apex window. Ball lands softly with immediate 2-foot backspin bite."
+    }
   }
 };
 

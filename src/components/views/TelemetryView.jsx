@@ -20,9 +20,11 @@ import {
 import Badge from '../shared/Badge';
 import MetricCard from '../shared/MetricCard';
 import { TELEMETRY_SHOTS, MOCK_USER } from '../../data/mockData';
+import { useRangeSession } from '../../context/RangeSessionContext';
 
 export default function TelemetryView() {
-  const [selectedClubKey, setSelectedClubKey] = useState('driver');
+  const { sessionShots, telemetryCatalog, activeClubKey, setActiveClubKey } = useRangeSession();
+  const [selectedClubKey, setSelectedClubKey] = useState(activeClubKey || 'driver');
   const [activeFilter, setActiveFilter] = useState('LAST SHOT'); // 'LAST SHOT' | 'DISPERSION' | 'CLUB AVERAGES' | 'HISTORY'
   const [showClubDropdown, setShowClubDropdown] = useState(false);
   const [showReplayModal, setShowReplayModal] = useState(false);
@@ -32,7 +34,14 @@ export default function TelemetryView() {
   const [flightProgress, setFlightProgress] = useState(1);
   const [interactiveImpact, setInteractiveImpact] = useState({ x: 14, y: -6, text: '+2mm Toe • High Flush' });
 
-  const currentShot = TELEMETRY_SHOTS[selectedClubKey] || TELEMETRY_SHOTS.driver;
+  // Sync selected club with context
+  useEffect(() => {
+    if (activeClubKey && telemetryCatalog[activeClubKey]) {
+      setSelectedClubKey(activeClubKey);
+    }
+  }, [activeClubKey]);
+
+  const currentShot = telemetryCatalog[selectedClubKey] || TELEMETRY_SHOTS[selectedClubKey] || TELEMETRY_SHOTS.driver;
 
   const handleAnimateFlight = () => {
     if (isFlightAnimating) return;
@@ -122,19 +131,20 @@ export default function TelemetryView() {
           {showClubDropdown && (
             <div className="absolute top-full left-0 mt-1.5 w-64 bg-[#181c24] border border-white/15 rounded-xl shadow-2xl p-1.5 z-30 font-mono text-xs animate-fade-in">
               <div className="px-2 py-1 text-[10px] text-gray-400 uppercase font-bold">Select Active Bag Club</div>
-              {Object.keys(TELEMETRY_SHOTS).map((clubKey) => (
+              {Object.keys(telemetryCatalog).map((clubKey) => (
                 <button
                   key={clubKey}
                   onClick={() => {
                     setSelectedClubKey(clubKey);
+                    setActiveClubKey(clubKey);
                     setShowClubDropdown(false);
                   }}
                   className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
                     selectedClubKey === clubKey ? 'bg-[#f61919] text-white font-bold' : 'hover:bg-white/5 text-gray-300'
                   }`}
                 >
-                  <span>{TELEMETRY_SHOTS[clubKey].club}</span>
-                  <span className="text-[10px] opacity-80">{TELEMETRY_SHOTS[clubKey].distance}</span>
+                  <span>{telemetryCatalog[clubKey].club}</span>
+                  <span className="text-[10px] opacity-80">{telemetryCatalog[clubKey].distance}</span>
                 </button>
               ))}
             </div>
@@ -477,15 +487,33 @@ export default function TelemetryView() {
             <div className="absolute h-full w-0.5 bg-emerald-500/40" />
             {/* 30 YD Fairway bounds with confidence glow */}
             <div className="w-36 h-48 border-2 border-emerald-500/40 rounded-[50px] bg-emerald-500/5 relative flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.12)]">
-              {/* Scatter dots */}
-              <div className="absolute w-2 h-2 rounded-full bg-white -top-6 left-12 opacity-80" />
+              {/* Dynamic Scatter dots from sessionShots */}
+              {sessionShots.slice(1, 8).map((s) => {
+                // Map offline string (e.g. "1.2 L" or "2.4 R") and carry to relative x, y inside oval
+                const isLeft = s.offline.includes('L');
+                const val = parseFloat(s.offline) || 1.0;
+                const posX = isLeft ? Math.max(10, 64 - val * 12) : Math.min(118, 64 + val * 12);
+                const posY = Math.max(15, Math.min(160, 85 - (s.carry - 250) * 0.8));
+                return (
+                  <div 
+                    key={s.shotNumber} 
+                    className="absolute w-2 h-2 rounded-full bg-white/75 hover:bg-emerald-400 hover:scale-150 transition-all cursor-pointer"
+                    style={{ left: `${posX}px`, top: `${posY}px` }}
+                    title={`Shot #${s.shotNumber}: ${s.clubName} - ${s.carry} YD (${s.offline})`}
+                  />
+                );
+              })}
               {/* Active current shot with animated beacon ring */}
-              <div className="absolute w-3 h-3 rounded-full bg-[#f61919] top-10 left-16 ring-2 ring-white/70 flex items-center justify-center shadow-[0_0_12px_rgba(246,25,25,0.8)]">
+              <div 
+                className="absolute w-3.5 h-3.5 rounded-full bg-[#f61919] ring-2 ring-white/80 flex items-center justify-center shadow-[0_0_14px_rgba(246,25,25,0.9)] z-10 transition-all duration-300"
+                style={{ 
+                  left: `${64 + (currentShot.flightMicroStats.offline.includes('L') ? -parseFloat(currentShot.flightMicroStats.offline) * 12 : parseFloat(currentShot.flightMicroStats.offline) * 12)}px`,
+                  top: `${Math.max(20, Math.min(150, 85 - (currentShot.carryYardage - 250) * 0.8))}px`
+                }}
+              >
                 <span className="absolute inset-0 rounded-full bg-[#f61919] animate-beacon opacity-75" />
+                <div className="w-1 h-1 rounded-full bg-white" />
               </div>
-              <div className="absolute w-2 h-2 rounded-full bg-white top-24 left-10 opacity-80" />
-              <div className="absolute w-2 h-2 rounded-full bg-white bottom-8 left-18 opacity-80" />
-              <div className="absolute w-2 h-2 rounded-full bg-white top-16 right-8 opacity-80" />
             </div>
             <div className="absolute bottom-2 left-2 text-[10px] font-mono text-gray-400">
               Corridor Width: 32 YD • Oval: 95% Confidence
@@ -497,16 +525,28 @@ export default function TelemetryView() {
       {/* FILTER VIEW: 3. CLUB AVERAGES */}
       {activeFilter === 'CLUB AVERAGES' && (
         <div className="p-4 rounded-2xl bg-[#13171f] border border-white/10 flex flex-col gap-3 animate-fade-in">
-          <h3 className="text-xs font-mono font-bold text-white uppercase">Bag Carry & Gapping Matrix</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-mono font-bold text-white uppercase">Bag Carry & Gapping Matrix</h3>
+            <span className="text-[10px] font-mono text-emerald-400">14-CLUB CALIBRATION</span>
+          </div>
           <div className="space-y-2 font-mono text-xs">
-            {Object.keys(TELEMETRY_SHOTS).map((k) => {
-              const shot = TELEMETRY_SHOTS[k];
-              const yardNum = parseInt(shot.distance) || 200;
-              const barWidth = Math.round((yardNum / 300) * 100);
+            {Object.keys(telemetryCatalog).map((k) => {
+              const shot = telemetryCatalog[k];
+              // Calculate club-specific average from sessionShots if available
+              const clubShots = sessionShots.filter(s => s.clubKey === k);
+              const calculatedAvgCarry = clubShots.length > 0
+                ? Math.round(clubShots.reduce((acc, s) => acc + (s.carry || 200), 0) / clubShots.length)
+                : parseInt(shot.distance) || 200;
+              const barWidth = Math.min(100, Math.round((calculatedAvgCarry / 300) * 100));
+
               return (
                 <div 
                   key={k} 
-                  onClick={() => { setSelectedClubKey(k); setActiveFilter('LAST SHOT'); }}
+                  onClick={() => { 
+                    setSelectedClubKey(k); 
+                    setActiveClubKey(k);
+                    setActiveFilter('LAST SHOT'); 
+                  }}
                   className="p-3 rounded-xl bg-[#181c24] hover:bg-[#1c222e] border border-white/5 hover:border-emerald-500/30 flex flex-col gap-2 transition-all duration-200 cursor-pointer hover:translate-x-1 group"
                 >
                   <div className="flex items-center justify-between">
@@ -517,10 +557,12 @@ export default function TelemetryView() {
                           <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-mono">ACTIVE</span>
                         )}
                       </div>
-                      <div className="text-[10px] text-gray-400">Smash: {shot.metrics[2]?.value} • Spin: {shot.metrics[3]?.value}</div>
+                      <div className="text-[10px] text-gray-400">
+                        Smash: {shot.metrics[2]?.value} • Spin: {shot.metrics[3]?.value} • {clubShots.length > 0 ? `${clubShots.length} hits` : 'Preset'}
+                      </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-base font-bold text-emerald-400">{shot.distance}</div>
+                      <div className="text-base font-bold text-emerald-400">{calculatedAvgCarry} YD</div>
                       <div className="text-[10px] text-gray-400">Carry Avg</div>
                     </div>
                   </div>
@@ -541,30 +583,40 @@ export default function TelemetryView() {
       {/* FILTER VIEW: 4. HISTORY */}
       {activeFilter === 'HISTORY' && (
         <div className="p-4 rounded-2xl bg-[#13171f] border border-white/10 flex flex-col gap-3 animate-fade-in">
-          <h3 className="text-xs font-mono font-bold text-white uppercase">Session Shot Log (Bay 04)</h3>
-          <div className="space-y-2 font-mono text-xs">
-            {[24, 23, 22, 21].map((num, idx) => (
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-mono font-bold text-white uppercase">Session Shot Log (Bay 04)</h3>
+            <span className="text-[10px] font-mono text-gray-400">{sessionShots.length} HITS RECORDED</span>
+          </div>
+          <div className="space-y-2 font-mono text-xs max-h-[380px] overflow-y-auto no-scrollbar pr-1">
+            {sessionShots.map((shot, idx) => (
               <div 
-                key={num} 
+                key={shot.shotNumber}
+                onClick={() => {
+                  setSelectedClubKey(shot.clubKey);
+                  setActiveClubKey(shot.clubKey);
+                  setActiveFilter('LAST SHOT');
+                }}
                 className="p-3 rounded-xl bg-[#181c24] hover:bg-[#1c222e] border border-white/5 hover:border-white/15 flex items-center justify-between transition-all duration-200 hover:translate-x-1 cursor-pointer group"
               >
                 <div className="flex items-center gap-2">
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] transition-colors ${
                     idx === 0 ? 'bg-[#f61919] text-white shadow-[0_0_8px_rgba(246,25,25,0.6)]' : 'bg-[#1b222d] text-white group-hover:bg-white/20'
                   }`}>
-                    #{num}
+                    #{shot.shotNumber}
                   </span>
                   <div>
                     <div className="font-bold text-white flex items-center gap-1.5">
-                      Driver (9.0°)
+                      {shot.clubName}
                       {idx === 0 && <span className="text-[9px] text-[#f61919] font-bold">LATEST</span>}
                     </div>
-                    <div className="text-[10px] text-gray-400">167.4 MPH Ball • 12.8° Launch</div>
+                    <div className="text-[10px] text-gray-400">
+                      {shot.ballSpeed} MPH Ball • {shot.launch}° Launch • {shot.shape}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right flex items-center gap-2">
-                  <div className="font-bold text-white">278 YD</div>
-                  <Badge variant="emerald" size="xs">FLUSH</Badge>
+                  <div className="font-bold text-white">{shot.carry} YD</div>
+                  <Badge variant="emerald" size="xs">{shot.tag}</Badge>
                 </div>
               </div>
             ))}

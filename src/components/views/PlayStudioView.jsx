@@ -12,24 +12,51 @@ import {
   ShieldCheck, 
   RotateCcw, 
   CheckCircle2, 
-  X,
-  Volume2,
-  Sliders,
-  ExternalLink
+  X, 
+  Volume2, 
+  Sliders, 
+  ExternalLink,
+  Clock,
+  Radio,
+  Zap,
+  Activity,
+  Award
 } from 'lucide-react';
 import Badge from '../shared/Badge';
+import SessionSummaryModal from '../shared/SessionSummaryModal';
 import { COURSES_CATALOG, MOCK_USER } from '../../data/mockData';
+import { useRangeSession } from '../../context/RangeSessionContext';
 
 export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToArena }) {
-  // Interactive States
+  // Global Range Session Context
+  const {
+    isSessionActive,
+    startSession,
+    endSession,
+    activeClubKey,
+    setActiveClubKey,
+    targetDistance,
+    setTargetDistance,
+    sensorMode,
+    setSensorMode,
+    elapsedTimeFormatted,
+    sessionShots,
+    lastShotFeedback,
+    triggerSimulatedShot,
+    showSummaryModal,
+    setShowSummaryModal,
+    sessionStats,
+    CLUB_PROFILES
+  } = useRangeSession();
+
+  // Local View States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isStriking, setIsStriking] = useState(false);
   const [lightingPreset, setLightingPreset] = useState('DUSK 60%');
   const [selectedCourseModal, setSelectedCourseModal] = useState(false);
   const [skillsModal, setSkillsModal] = useState(false);
   const [bagMappingModal, setBagMappingModal] = useState(false);
   const [aiCoachModal, setAiCoachModal] = useState(false);
-  const [isSimulatingSession, setIsSimulatingSession] = useState(false);
-  const [sessionShotCount, setSessionShotCount] = useState(24);
-  const [lastShotFeedback, setLastShotFeedback] = useState(null);
 
   const lightingOptions = ['DUSK 60%', 'DAYLIGHT 100%', 'NIGHT STADIUM', 'SUNSET 45%'];
 
@@ -38,21 +65,30 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
     setLightingPreset(lightingOptions[nextIdx]);
   };
 
-  const handleStartSession = () => {
-    setIsSimulatingSession(true);
-    setLastShotFeedback(null);
+  const handleLaunchSession = () => {
+    if (!isSessionActive) {
+      startSession('driver');
+    }
+    setIsModalOpen(true);
   };
 
-  const handleTriggerSimulatedShot = () => {
-    const newCount = sessionShotCount + 1;
-    setSessionShotCount(newCount);
-    setLastShotFeedback({
-      carry: '281 YD',
-      ballSpeed: '168.2 MPH',
-      launch: '12.4°',
-      tag: 'PURE FLUSH'
-    });
+  const handleStrike = () => {
+    setIsStriking(true);
+    triggerSimulatedShot();
+    setTimeout(() => {
+      setIsStriking(false);
+    }, 400);
   };
+
+  // Club selector choices
+  const clubChoices = [
+    { key: 'driver', label: 'Driver', spec: '9.0°', defaultTarget: 250 },
+    { key: '3wood', label: '3-Wood', spec: '15.0°', defaultTarget: 240 },
+    { key: '5iron', label: '5-Iron', spec: '26.0°', defaultTarget: 200 },
+    { key: '8iron', label: '8-Iron', spec: '37.0°', defaultTarget: 165 },
+    { key: 'pw', label: 'PW', spec: '46.0°', defaultTarget: 135 },
+    { key: '56w', label: '56°', spec: '56.0°', defaultTarget: 100 }
+  ];
 
   return (
     <div className="flex flex-col gap-4 px-4 pt-3 pb-8 text-left animate-fade-in">
@@ -60,21 +96,39 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
       <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#141822] border border-white/10 shadow-sm">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isSessionActive ? 'bg-red-400' : 'bg-emerald-400'}`} />
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${isSessionActive ? 'bg-[#f61919]' : 'bg-emerald-500'}`} />
           </span>
           <div className="flex flex-col">
-            <span className="text-[11px] font-mono font-bold text-gray-200 uppercase tracking-tight">
-              RSG PRO STUDIO ONLINE
+            <span className="text-[11px] font-mono font-bold text-gray-200 uppercase tracking-tight flex items-center gap-1.5">
+              {isSessionActive ? (
+                <>
+                  <span className="text-[#f61919]">BAY 04 LIVE</span>
+                  <span className="text-gray-400 font-normal">({elapsedTimeFormatted})</span>
+                </>
+              ) : (
+                'RSG PRO STUDIO ONLINE'
+              )}
             </span>
             <span className="text-[9px] font-mono text-gray-400">
               Dual Machine Vision (3,200 FPS)
             </span>
           </div>
         </div>
-        <Badge variant="emerald" size="xs" dot>
-          CALIBRATED
-        </Badge>
+
+        {isSessionActive ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-2.5 py-1 rounded-lg bg-[#f61919]/20 hover:bg-[#f61919]/30 border border-[#f61919]/40 text-[#ff3b30] font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+          >
+            <Radio className="w-3 h-3 animate-pulse" />
+            OPEN BAY
+          </button>
+        ) : (
+          <Badge variant="emerald" size="xs" dot>
+            CALIBRATED
+          </Badge>
+        )}
       </div>
 
       {/* 2. Hero Session Card */}
@@ -94,7 +148,7 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
               BAY 04 • ULTRA-HDR
             </Badge>
             <Badge variant="limeSolid" size="xs" className="font-mono">
-              PIN: 241 YD
+              TARGET PIN: {targetDistance} YD
             </Badge>
           </div>
         </div>
@@ -102,24 +156,41 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
         {/* Content & Action Buttons */}
         <div className="relative p-4 -mt-12 flex flex-col gap-3">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#ff3b30] font-bold">
-              ACTIVE SIMULATOR BAY
-            </span>
-            <h2 className="text-2xl font-black font-display tracking-tight text-white">
-              Quick Session Launch
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#ff3b30] font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#f61919] animate-pulse" />
+                ACTIVE SIMULATOR BAY 04
+              </span>
+              {isSessionActive && (
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  {sessionShots.length} HITS LOGGED
+                </span>
+              )}
+            </div>
+            <h2 className="text-2xl font-black font-display tracking-tight text-white mt-0.5">
+              {isSessionActive ? 'Driving Range Active' : 'Quick Session Launch'}
             </h2>
             <p className="text-xs text-gray-400 font-sans mt-0.5">
-              High-speed optical shutter active. Ready for driver through wedge telemetry.
+              3,200 FPS high-speed optical shutter active. Calibrated for 14-club bag matrix.
             </p>
           </div>
 
-          {/* Main Red Launch Button */}
+          {/* Main Red Launch / Resume Button */}
           <button
-            onClick={handleStartSession}
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#f61919] to-[#d61313] hover:from-[#ff3b30] hover:to-[#f61919] text-white font-display font-extrabold text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(246,25,25,0.45)] hover:shadow-[0_0_32px_rgba(246,25,25,0.65)] active:scale-[0.98] transition-all cursor-pointer"
+            onClick={handleLaunchSession}
+            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#f61919] to-[#d61313] hover:from-[#ff3b30] hover:to-[#f61919] text-white font-display font-extrabold text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(246,25,25,0.45)] hover:shadow-[0_0_32px_rgba(246,25,25,0.65)] active:scale-[0.98] transition-all cursor-pointer group"
           >
-            <Play className="w-4 h-4 fill-white" />
-            START RANGE SESSION
+            {isSessionActive ? (
+              <>
+                <Radio className="w-4 h-4 text-white animate-pulse" />
+                RESUME ACTIVE SESSION ({elapsedTimeFormatted})
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 fill-white" />
+                START RANGE SESSION
+              </>
+            )}
           </button>
 
           {/* Secondary Outline Row */}
@@ -152,7 +223,7 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
             </h3>
           </div>
           <span className="text-[10px] font-mono text-gray-400 uppercase">
-            Today • 08:42 AM
+            Today • Bay 04 Session
           </span>
         </div>
 
@@ -160,15 +231,17 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-sm font-bold text-white font-display">
-                Spyglass Dunes Championship
+                Active Bag Carry Matrix
               </span>
               <span className="text-[11px] text-gray-400 font-sans">
-                Full 18 Holes • RSG Tour Pins
+                {sessionShots.length} total shots tracked in session
               </span>
             </div>
             <div className="flex items-center gap-1.5 bg-[#1b222d] px-2.5 py-1 rounded-lg border border-white/5">
-              <span className="font-mono text-base font-bold text-[#10b981]">-2</span>
-              <span className="text-xs font-mono text-gray-400">(70)</span>
+              <span className="font-mono text-base font-bold text-[#10b981]">
+                {sessionStats.avgSmash}
+              </span>
+              <span className="text-xs font-mono text-gray-400">SMASH</span>
             </div>
           </div>
 
@@ -179,20 +252,21 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
                 Avg Carry
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg font-mono font-bold text-white">278</span>
+                <span className="text-lg font-mono font-bold text-white">{sessionStats.avgCarry}</span>
                 <span className="text-[10px] font-mono text-gray-400">YD</span>
               </div>
               <span className="text-[9px] font-mono text-[#10b981] mt-0.5 font-bold">
-                Driver Opt.
+                Optimized
               </span>
             </div>
 
             <div className="p-2.5 rounded-xl bg-[#181c24] border border-white/5 flex flex-col">
               <span className="text-[9px] font-mono text-gray-400 uppercase font-semibold">
-                Smash Factor
+                Avg Ball Speed
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg font-mono font-bold text-white">1.49</span>
+                <span className="text-lg font-mono font-bold text-white">{sessionStats.avgBallSpeed}</span>
+                <span className="text-[10px] font-mono text-gray-400">MPH</span>
               </div>
               <span className="text-[9px] font-mono text-[#10b981] mt-0.5 font-bold">
                 Tour Elite
@@ -201,14 +275,14 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
 
             <div className="p-2.5 rounded-xl bg-[#181c24] border border-white/5 flex flex-col">
               <span className="text-[9px] font-mono text-gray-400 uppercase font-semibold">
-                Launch Angle
+                Corridor Tight
               </span>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-lg font-mono font-bold text-white">11.2</span>
-                <span className="text-[10px] font-mono text-gray-400">°</span>
+                <span className="text-lg font-mono font-bold text-white">{sessionStats.accuracyPct}</span>
+                <span className="text-[10px] font-mono text-gray-400">%</span>
               </div>
               <span className="text-[9px] font-mono text-[#a3e635] mt-0.5 font-bold">
-                Window Locked
+                &lt; 30 YD Fairway
               </span>
             </div>
           </div>
@@ -343,84 +417,239 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
         </div>
       </div>
 
-      {/* --- MODALS & INTERACTIVE OVERLAYS --- */}
-
-      {/* Active Range Session Simulation Modal */}
-      {isSimulatingSession && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-[400px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
-            <button
-              onClick={() => setIsSimulatingSession(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-3 h-3 rounded-full bg-[#f61919] animate-ping" />
-              <h3 className="font-display font-black text-xl text-white">BAY 04 • ACTIVE SESSION</h3>
-            </div>
-
-            <div className="p-3 bg-[#181c24] rounded-xl border border-white/10 mb-4">
-              <div className="flex justify-between items-center text-xs font-mono mb-2">
-                <span className="text-gray-400">SESSION SHOTS:</span>
-                <span className="text-white font-bold">{sessionShotCount} Hits</span>
-              </div>
-              <div className="flex justify-between items-center text-xs font-mono">
-                <span className="text-gray-400">CURRENT CLUB:</span>
-                <span className="text-emerald-400 font-bold">Driver (9.0°)</span>
-              </div>
-            </div>
-
-            {lastShotFeedback ? (
-              <div className="p-4 bg-gradient-to-br from-[#1b222d] to-[#121620] rounded-xl border border-emerald-500/30 mb-4 animate-fade-in">
-                <div className="flex justify-between items-center mb-2">
-                  <Badge variant="emerald" size="xs">BALL FLIGHT DETECTED</Badge>
-                  <span className="text-xs font-mono font-bold text-emerald-400">{lastShotFeedback.tag}</span>
+      {/* --- TOUR-GRADE RANGE SESSION HUD MODAL --- */}
+      {isModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-3.5 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-[420px] max-h-[94vh] bg-[#13171f] border border-white/15 rounded-2xl p-4 shadow-2xl relative text-left flex flex-col overflow-y-auto no-scrollbar">
+            
+            {/* Modal Top Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#f61919] animate-pulse" />
+                <div>
+                  <h3 className="font-display font-black text-base text-white tracking-tight">
+                    BAY 04 • RANGE HUD
+                  </h3>
+                  <div className="flex items-center gap-1.5 font-mono text-[9px] text-gray-400">
+                    <span className="text-emerald-400 font-bold">3,200 FPS DUAL-VISION</span>
+                    <span>•</span>
+                    <span className="text-gray-300">{elapsedTimeFormatted}</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center mt-3">
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    endSession();
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-[#f61919]/20 hover:bg-[#f61919]/30 border border-[#f61919]/40 text-[#ff3b30] font-mono text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                  title="End session and view Performance Audit Report"
+                >
+                  End Session
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* In-Session Club Selector Strip */}
+            <div className="my-2.5">
+              <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 mb-1.5 font-bold uppercase">
+                <span>Select Bag Club</span>
+                <span className="text-white">{CLUB_PROFILES[activeClubKey]?.name}</span>
+              </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {clubChoices.map((c) => {
+                  const isActive = activeClubKey === c.key;
+                  return (
+                    <button
+                      key={c.key}
+                      onClick={() => {
+                        setActiveClubKey(c.key);
+                        setTargetDistance(c.defaultTarget);
+                      }}
+                      className={`shrink-0 px-2.5 py-1.5 rounded-xl font-mono text-xs font-bold transition-all cursor-pointer flex flex-col items-center ${
+                        isActive
+                          ? 'bg-[#f61919] text-white shadow-[0_0_12px_rgba(246,25,25,0.6)] scale-[1.03]'
+                          : 'bg-[#181c24] hover:bg-[#202735] text-gray-300 border border-white/5'
+                      }`}
+                    >
+                      <span>{c.label}</span>
+                      <span className="text-[9px] opacity-75 font-normal">{c.spec}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Target Distance & Sensor Mode Selector Row */}
+            <div className="grid grid-cols-2 gap-2 mb-3 font-mono text-xs">
+              {/* Target Yardage Picker */}
+              <div className="p-2 rounded-xl bg-[#181c24] border border-white/5 flex flex-col justify-between">
+                <span className="text-[9px] text-gray-400 uppercase font-bold">Target Pin</span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-sm font-bold text-white">{targetDistance} YD</span>
+                  <div className="flex gap-1">
+                    {[150, 200, 250].map((dist) => (
+                      <button
+                        key={dist}
+                        onClick={() => setTargetDistance(dist)}
+                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold cursor-pointer ${
+                          targetDistance === dist ? 'bg-white/20 text-white' : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {dist}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sensor Trigger Mode Toggle */}
+              <div className="p-2 rounded-xl bg-[#181c24] border border-white/5 flex flex-col justify-between">
+                <span className="text-[9px] text-gray-400 uppercase font-bold">Sensor Mode</span>
+                <div className="flex items-center justify-between mt-1">
+                  <button
+                    onClick={() => setSensorMode(sensorMode === 'manual' ? 'auto' : 'manual')}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-all cursor-pointer flex items-center gap-1 ${
+                      sensorMode === 'auto'
+                        ? 'bg-emerald-500 text-black font-extrabold shadow-[0_0_10px_rgba(16,185,129,0.5)]'
+                        : 'bg-[#141822] text-gray-300 border border-white/10'
+                    }`}
+                  >
+                    <Zap className="w-3 h-3" />
+                    {sensorMode === 'auto' ? 'Auto Sensor' : 'Manual Strike'}
+                  </button>
+                  <span className="text-[9px] text-gray-400">
+                    {sensorMode === 'auto' ? '6s' : 'Tap'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Shot Feedback Screen */}
+            {lastShotFeedback ? (
+              <div className="p-3.5 bg-gradient-to-br from-[#1b222d] to-[#121620] rounded-2xl border border-emerald-500/40 mb-3 animate-fade-in shadow-xl relative overflow-hidden">
+                {/* Header of feedback */}
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <Badge variant="emerald" size="xs">SHOT #{lastShotFeedback.shotNumber} REGISTERED</Badge>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-emerald-400">
+                    {lastShotFeedback.tag}
+                  </span>
+                </div>
+
+                {/* Primary Launch Monitor Metrics */}
+                <div className="grid grid-cols-3 gap-2 text-center py-2 border-y border-white/5 font-mono">
                   <div>
-                    <div className="text-[10px] text-gray-400 font-mono">CARRY</div>
-                    <div className="text-xl font-mono font-bold text-white">{lastShotFeedback.carry}</div>
+                    <div className="text-[9px] text-gray-400">CARRY</div>
+                    <div className="text-xl font-bold text-white mt-0.5">{lastShotFeedback.carry}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] text-gray-400 font-mono">BALL SPEED</div>
-                    <div className="text-xl font-mono font-bold text-white">{lastShotFeedback.ballSpeed}</div>
+                    <div className="text-[9px] text-gray-400">BALL SPEED</div>
+                    <div className="text-xl font-bold text-white mt-0.5">{lastShotFeedback.ballSpeed}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] text-gray-400 font-mono">LAUNCH</div>
-                    <div className="text-xl font-mono font-bold text-white">{lastShotFeedback.launch}</div>
+                    <div className="text-[9px] text-gray-400">LAUNCH</div>
+                    <div className="text-xl font-bold text-white mt-0.5">{lastShotFeedback.launch}</div>
                   </div>
+                </div>
+
+                {/* Secondary Aerodynamics Row */}
+                <div className="grid grid-cols-3 gap-2 text-center pt-2 font-mono text-[10px]">
+                  <div className="text-gray-400">
+                    Total: <span className="text-white font-bold">{lastShotFeedback.total}</span>
+                  </div>
+                  <div className="text-gray-400">
+                    Spin: <span className="text-white font-bold">{lastShotFeedback.spin}</span>
+                  </div>
+                  <div className="text-gray-400">
+                    Smash: <span className="text-emerald-400 font-bold">{lastShotFeedback.smash}</span>
+                  </div>
+                </div>
+
+                {/* Mini Trajectory Preview Status */}
+                <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-400">
+                  <span className="text-emerald-400 font-bold flex items-center gap-1">
+                    <Activity className="w-3 h-3" />
+                    Flight Shape: {lastShotFeedback.shape}
+                  </span>
+                  <span className="text-gray-400">Target Pin: {targetDistance} YD</span>
                 </div>
               </div>
             ) : (
-              <div className="p-6 text-center border-2 border-dashed border-white/10 rounded-xl mb-4 bg-[#181c24]/50">
-                <div className="text-xs font-mono text-gray-300">
-                  Ready on stance mat. Take your swing into the RSG projection screen.
+              <div className="p-5 text-center border border-dashed border-white/15 rounded-2xl mb-3 bg-[#181c24]/60 flex flex-col items-center justify-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-[#1b222d] border border-white/10 flex items-center justify-center text-[#f61919] animate-pulse">
+                  <Radio className="w-5 h-5" />
                 </div>
+                <div className="text-xs font-mono font-bold text-white uppercase">
+                  Optical Machine Vision Armed (3,200 FPS)
+                </div>
+                <p className="text-[11px] text-gray-400 font-sans max-w-[280px]">
+                  Ball detected on stance mat hitting turf. Take your swing into the RSG projection screen.
+                </p>
               </div>
             )}
 
-            <div className="space-y-2">
+            {/* Session Action Controls */}
+            <div className="space-y-2 mt-auto">
+              {/* Primary Strike Button */}
               <button
-                onClick={handleTriggerSimulatedShot}
-                className="w-full py-3 rounded-xl bg-[#f61919] hover:bg-[#ff3b30] text-white font-display font-extrabold text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(246,25,25,0.4)] cursor-pointer"
+                onClick={handleStrike}
+                disabled={isStriking}
+                className={`w-full py-3.5 rounded-xl bg-gradient-to-r from-[#f61919] to-[#d61313] hover:from-[#ff3b30] hover:to-[#f61919] text-white font-display font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(246,25,25,0.45)] cursor-pointer transition-all active:scale-[0.98] ${
+                  isStriking ? 'scale-[0.98] opacity-80' : ''
+                }`}
               >
-                Simulate Shot Trigger
+                <Play className="w-4 h-4 fill-white" />
+                {isStriking ? 'CAPTURING 3,200 FPS OPTICS...' : 'STRIKE BALL (MACHINE VISION CAPTURE)'}
               </button>
-              <button
-                onClick={() => {
-                  setIsSimulatingSession(false);
-                  onNavigateToTelemetry();
-                }}
-                className="w-full py-2.5 rounded-xl bg-[#1b222d] hover:bg-[#242c3a] text-white font-bold text-xs uppercase tracking-wider border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                Inspect Telemetry Radar →
-              </button>
+
+              {/* Action Buttons Row */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    onNavigateToTelemetry();
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-[#1b222d] hover:bg-[#242c3a] text-white font-mono font-bold text-xs uppercase tracking-wider border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                >
+                  Telemetry Radar →
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    endSession();
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-[#1b222d] hover:bg-[#242c3a] text-amber-300 font-mono font-bold text-xs uppercase tracking-wider border border-amber-400/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                >
+                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                  Audit Report
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* --- EXECUTIVE SESSION SUMMARY REPORT MODAL --- */}
+      <SessionSummaryModal
+        isOpen={showSummaryModal}
+        onClose={() => setShowSummaryModal(false)}
+        sessionStats={sessionStats}
+        sessionShots={sessionShots}
+        elapsedTime={elapsedTimeFormatted}
+        onNavigateToTelemetry={onNavigateToTelemetry}
+      />
 
       {/* 100+ Courses Catalog Modal */}
       {selectedCourseModal && (
@@ -456,9 +685,9 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
                   <button 
                     onClick={() => {
                       setSelectedCourseModal(false);
-                      handleStartSession();
+                      handleLaunchSession();
                     }}
-                    className="px-2.5 py-1.5 rounded-lg bg-[#f61919] hover:bg-[#ff3b30] text-white text-[10px] font-bold uppercase"
+                    className="px-2.5 py-1.5 rounded-lg bg-[#f61919] hover:bg-[#ff3b30] text-white text-[10px] font-bold uppercase cursor-pointer"
                   >
                     Load Bay
                   </button>
@@ -468,7 +697,7 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
 
             <button
               onClick={() => setSelectedCourseModal(false)}
-              className="w-full py-2 bg-[#1b222d] text-gray-300 text-xs font-bold rounded-xl uppercase"
+              className="w-full py-2 bg-[#1b222d] text-gray-300 text-xs font-bold rounded-xl uppercase cursor-pointer"
             >
               Close Catalog
             </button>
@@ -506,7 +735,7 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
                 setBagMappingModal(false);
                 onNavigateToTelemetry();
               }}
-              className="w-full py-2.5 bg-[#f61919] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-[0_0_12px_rgba(246,25,25,0.4)]"
+              className="w-full py-2.5 bg-[#f61919] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-[0_0_12px_rgba(246,25,25,0.4)] cursor-pointer"
             >
               View Detailed Telemetry
             </button>
@@ -547,9 +776,9 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
             <button
               onClick={() => {
                 setSkillsModal(false);
-                handleStartSession();
+                handleLaunchSession();
               }}
-              className="w-full py-2.5 bg-[#f61919] text-white font-bold text-xs uppercase rounded-xl"
+              className="w-full py-2.5 bg-[#f61919] text-white font-bold text-xs uppercase rounded-xl cursor-pointer"
             >
               Launch Drill in Bay 04
             </button>
@@ -589,7 +818,7 @@ export default function PlayStudioView({ onNavigateToTelemetry, onNavigateToAren
 
             <button
               onClick={() => setAiCoachModal(false)}
-              className="w-full py-2.5 bg-[#1b222d] text-white font-bold text-xs uppercase rounded-xl"
+              className="w-full py-2.5 bg-[#1b222d] text-white font-bold text-xs uppercase rounded-xl cursor-pointer"
             >
               Back to Bay
             </button>
