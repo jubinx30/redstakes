@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import Badge from '../shared/Badge';
 import MetricCard from '../shared/MetricCard';
+import PhonePortal from '../shared/PhonePortal';
+import HighSpeedReplayView from '../telemetry/HighSpeedReplayView';
 import { TELEMETRY_SHOTS, MOCK_USER } from '../../data/mockData';
 import { useRangeSession } from '../../context/RangeSessionContext';
 
@@ -654,124 +656,92 @@ export default function TelemetryView() {
         </div>
       </div>
 
-      {/* --- MODALS --- */}
+      {/* --- MODALS & FULL-SCREEN OVERLAYS (PORTALED TO PHONE FRAME ROOT) --- */}
 
-      {/* 480 FPS Camera Replay Modal */}
+      {/* 480 FPS High-Speed Camera Replay Page / Full View */}
       {showReplayModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-[400px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
-            <button
-              onClick={() => setShowReplayModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#f61919] animate-pulse" />
-              <h3 className="font-display font-bold text-lg text-white">480 FPS Impact High-Speed</h3>
-            </div>
-            
-            {/* Simulated Video Player */}
-            <div className="relative w-full h-48 rounded-xl bg-[#0a0d14] border border-white/10 overflow-hidden mb-3 flex items-center justify-center group">
-              <img 
-                src="/images/lifestyle_wide.png" 
-                alt="Impact Replay" 
-                className="w-full h-full object-cover opacity-50 filter brightness-90 contrast-125"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 font-mono text-[9px] text-[#a3e635]">
-                SLOW-MO: 0.125x SPEED
-              </div>
-              <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center text-[10px] font-mono text-gray-300">
-                <span>0.00ms (Impact Compression)</span>
-                <span className="text-emerald-400 font-bold">Flush Groove #3</span>
-              </div>
-            </div>
-
-            <p className="text-xs text-gray-300 mb-4 font-sans leading-relaxed">
-              Ultra high-speed optical capture confirms clean ball decompression without face deflection. Clubhead speed was sustained at 114.2 MPH through bottom quadrant.
-            </p>
-
-            <button
-              onClick={() => setShowReplayModal(false)}
-              className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase rounded-xl transition-all active:scale-95 cursor-pointer"
-            >
-              Close Replay
-            </button>
-          </div>
-        </div>
+        <PhonePortal>
+          <HighSpeedReplayView
+            shot={currentShot}
+            onClose={() => setShowReplayModal(false)}
+          />
+        </PhonePortal>
       )}
 
       {/* PGA Baseline Comparison Modal */}
       {showBaselineModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-[400px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
-            <button
-              onClick={() => setShowBaselineModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="font-display font-bold text-lg text-white mb-2">PGA Tour Baseline Comparison</h3>
-            <p className="text-xs text-gray-400 mb-3 font-sans">Benchmarked against TrackMan 2024 PGA Tour player average statistics.</p>
-            
-            <div className="space-y-2 font-mono text-xs mb-4">
-              <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
-                <span className="text-gray-400">Ball Speed:</span>
-                <span className="text-white font-bold">167.4 vs Tour 168.0 MPH</span>
+        <PhonePortal>
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in text-left">
+            <div className="w-full max-w-[390px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
+              <button
+                onClick={() => setShowBaselineModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h3 className="font-display font-bold text-lg text-white mb-2">PGA Tour Baseline Comparison</h3>
+              <p className="text-xs text-gray-400 mb-3 font-sans">Benchmarked against TrackMan 2024 PGA Tour player average statistics.</p>
+              
+              <div className="space-y-2 font-mono text-xs mb-4">
+                <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
+                  <span className="text-gray-400">Ball Speed:</span>
+                  <span className="text-white font-bold">167.4 vs Tour 168.0 MPH</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
+                  <span className="text-gray-400">Launch Angle:</span>
+                  <span className="text-white font-bold">12.8° vs Tour 11.2°</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
+                  <span className="text-gray-400">Spin Rate:</span>
+                  <span className="text-white font-bold">2,420 vs Tour 2,500 RPM</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
+                  <span className="text-gray-400">Smash Factor:</span>
+                  <span className="text-emerald-400 font-bold">1.47 vs Tour 1.49</span>
+                </div>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
-                <span className="text-gray-400">Launch Angle:</span>
-                <span className="text-white font-bold">12.8° vs Tour 11.2°</span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
-                <span className="text-gray-400">Spin Rate:</span>
-                <span className="text-white font-bold">2,420 vs Tour 2,500 RPM</span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-[#181c24] flex justify-between items-center">
-                <span className="text-gray-400">Smash Factor:</span>
-                <span className="text-emerald-400 font-bold">1.47 vs Tour 1.49</span>
-              </div>
-            </div>
 
-            <button
-              onClick={() => setShowBaselineModal(false)}
-              className="w-full py-2.5 bg-[#1b222d] hover:bg-[#242c3a] text-white font-bold text-xs uppercase rounded-xl transition-all cursor-pointer"
-            >
-              Done
-            </button>
+              <button
+                onClick={() => setShowBaselineModal(false)}
+                className="w-full py-2.5 bg-[#1b222d] hover:bg-[#242c3a] text-white font-bold text-xs uppercase rounded-xl transition-all cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
           </div>
-        </div>
+        </PhonePortal>
       )}
 
       {/* Drill Preview Modal */}
       {showDrillModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-[400px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
-            <button
-              onClick={() => setShowDrillModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <h3 className="font-display font-bold text-lg text-white">Gate Tee Face Centering</h3>
+        <PhonePortal>
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in text-left">
+            <div className="w-full max-w-[390px] bg-[#13171f] border border-white/15 rounded-2xl p-5 shadow-2xl relative text-left">
+              <button
+                onClick={() => setShowDrillModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                <h3 className="font-display font-bold text-lg text-white">Gate Tee Face Centering</h3>
+              </div>
+              <p className="text-xs text-gray-300 font-sans mb-3 leading-relaxed">
+                Setup two alignment tees 2 inches outside the toe and heel of your driver. Swing through the gate without clipping either peg to tighten sweet spot clustering.
+              </p>
+              <div className="p-3 bg-[#181c24] rounded-xl border border-white/5 font-mono text-xs text-emerald-400 mb-4">
+                Goal: Eliminate the +2mm toe bias and achieve 1.49 smash efficiency.
+              </div>
+              <button
+                onClick={() => setShowDrillModal(false)}
+                className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase rounded-xl transition-all active:scale-95 cursor-pointer"
+              >
+                Start Drill in Bay
+              </button>
             </div>
-            <p className="text-xs text-gray-300 font-sans mb-3 leading-relaxed">
-              Setup two alignment tees 2 inches outside the toe and heel of your driver. Swing through the gate without clipping either peg to tighten sweet spot clustering.
-            </p>
-            <div className="p-3 bg-[#181c24] rounded-xl border border-white/5 font-mono text-xs text-emerald-400 mb-4">
-              Goal: Eliminate the +2mm toe bias and achieve 1.49 smash efficiency.
-            </div>
-            <button
-              onClick={() => setShowDrillModal(false)}
-              className="w-full py-2.5 bg-[#f61919] hover:bg-[#ff3b30] text-white font-bold text-xs uppercase rounded-xl transition-all active:scale-95 cursor-pointer"
-            >
-              Start Drill in Bay
-            </button>
           </div>
-        </div>
+        </PhonePortal>
       )}
     </div>
   );

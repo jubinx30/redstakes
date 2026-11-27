@@ -31,8 +31,8 @@ export default function BottomNav({ activeTab, onSelectTab, cartCount = 1 }) {
   ];
 
   return (
-    <nav className="absolute bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none">
-      <div className="w-full backdrop-blur-2xl bg-[#0b0d10]/94 border-t border-white/10 px-3 pt-2 pb-4 flex items-center justify-around pointer-events-auto shadow-[0_-8px_30px_rgba(0,0,0,0.85)]">
+    <nav className="fixed sm:absolute bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="w-full max-w-[458px] backdrop-blur-2xl bg-[#0b0d10]/95 border-t border-white/10 px-2 sm:px-3 pt-2 pb-3.5 sm:pb-4 flex items-center justify-around pointer-events-auto shadow-[0_-8px_30px_rgba(0,0,0,0.85)]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

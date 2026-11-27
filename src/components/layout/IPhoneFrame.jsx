@@ -2,25 +2,11 @@ import React from 'react';
 
 export default function IPhoneFrame({ children }) {
   return (
-    <div className="min-h-screen w-full bg-[#050608] flex items-center justify-center p-0 sm:py-6 overflow-x-hidden overflow-y-auto select-none relative">
-      {/* Subtle Studio Ambient Background Lights */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[550px] bg-red-600/[0.04] rounded-full blur-[140px]" />
-        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[400px] bg-emerald-500/[0.025] rounded-full blur-[120px]" />
-        {/* Subtle grid pattern for aerospace studio feel */}
-        <div 
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
-            backgroundSize: '32px 32px'
-          }}
-        />
-      </div>
-
+    <div className="w-full h-full h-[100dvh] sm:min-h-screen sm:h-auto bg-[#0b0d10] sm:bg-[#06080a] flex items-center justify-center p-0 sm:py-6 overflow-hidden sm:overflow-y-auto select-none relative">
       {/* Main Wrapper Container */}
-      <div className="relative z-10 flex flex-col items-center">
-        {/* Outer Chassis in #1e2029 */}
-        <div className="relative w-full sm:w-[458px] h-screen sm:h-[974px] sm:max-h-[96vh] bg-[#1e2029] border border-[#2d3240] shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1px_2px_rgba(255,255,255,0.18)] sm:rounded-[56px] p-0 sm:p-[9px] flex flex-col transition-all">
+      <div className="relative z-10 w-full h-full sm:w-auto sm:h-auto flex flex-col items-center">
+        {/* Outer Chassis */}
+        <div className="relative w-full h-full sm:w-[458px] sm:h-[974px] sm:max-h-[96vh] bg-[#0b0d10] sm:bg-[#1e2029] border-0 sm:border sm:border-[#2d3240] rounded-none sm:rounded-[56px] p-0 sm:p-[9px] flex flex-col transition-all overflow-hidden sm:shadow-2xl">
           
           {/* Hardware Buttons */}
           {/* Action Button (Left Top) */}
@@ -54,14 +40,14 @@ export default function IPhoneFrame({ children }) {
           />
 
           {/* OLED Screen Bezel & Container - Ultra-thin 1.15mm Micro-Bezel */}
-          <div className="relative w-full h-full bg-[#0b0d10] text-white sm:rounded-[47px] overflow-hidden flex flex-col ring-1 ring-black/90 shadow-2xl">
+          <div className="relative w-full h-full bg-[#0b0d10] text-white rounded-none sm:rounded-[47px] overflow-hidden flex flex-col sm:ring-1 sm:ring-black/90">
             {/* Main App Content Viewport */}
-            <div className="relative flex-1 w-full min-h-0 flex flex-col overflow-hidden">
+            <div className="relative flex-1 w-full min-h-0 h-full flex flex-col overflow-hidden">
               {children}
             </div>
 
-            {/* iOS Home Indicator Bar */}
-            <div className="absolute bottom-1 left-0 right-0 z-50 flex justify-center pointer-events-none pb-1">
+            {/* iOS Home Indicator Bar - Only on desktop simulation frame */}
+            <div className="hidden sm:flex absolute bottom-1 left-0 right-0 z-50 justify-center pointer-events-none pb-1">
               <div className="w-32 h-1 bg-white/35 rounded-full backdrop-blur-sm" />
             </div>
 

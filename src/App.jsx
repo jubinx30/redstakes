@@ -71,7 +71,7 @@ export default function App() {
   return (
     <RangeSessionProvider>
       <IPhoneFrame>
-        <div className="relative w-full h-full flex flex-col overflow-hidden bg-[#0b0d10] text-white">
+        <div id="phone-screen-root" className="relative w-full h-full flex flex-col overflow-hidden bg-[#0b0d10] text-white">
           {/* Top Header inside app screen */}
           <TopHeader 
             user={user} 
@@ -82,7 +82,7 @@ export default function App() {
           />
 
           {/* Dynamic Main Views (Scrollable) */}
-          <main className="flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar pb-28">
+          <main className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar pb-24 sm:pb-28 overscroll-contain">
             {activeTab === 'play' && (
               <PlayStudioView 
                 onNavigateToTelemetry={() => setActiveTab('telemetry')}
