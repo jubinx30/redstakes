@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import IPhoneFrame from './components/layout/IPhoneFrame';
 import TopHeader from './components/layout/TopHeader';
 import BottomNav from './components/layout/BottomNav';
@@ -6,17 +6,17 @@ import PlayStudioView from './components/views/PlayStudioView';
 import TelemetryView from './components/views/TelemetryView';
 import ArenaView from './components/views/ArenaView';
 import ProShopView from './components/views/ProShopView';
+import CheckoutView from './components/views/CheckoutView';
 import AuthModal from './components/auth/AuthModal';
 import { MOCK_USER, PRODUCTS } from './data/mockData';
-import { Crown, Wifi, BatteryMedium, Signal, X, LogOut, UserCheck } from 'lucide-react';
+import { Crown, X, LogOut, UserCheck } from 'lucide-react';
 import Badge from './components/shared/Badge';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('play'); // 'play' | 'telemetry' | 'arena' | 'shop'
+  const [activeTab, setActiveTab] = useState('play'); // 'play' | 'telemetry' | 'arena' | 'shop' | 'checkout'
   const [user, setUser] = useState(MOCK_USER);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isDynamicIslandExpanded, setIsDynamicIslandExpanded] = useState(false);
 
   // Cart state: initial item is the Flagship RSG Pro Studio Club Edition
   const [cart, setCart] = useState([
@@ -32,10 +32,18 @@ export default function App() {
     setCart((prev) => {
       const exists = prev.find(item => item.id === product.id);
       if (exists) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+        return prev.map(item => item.id === product.id ? { ...item, quantity: (item.quantity || 1) + 1 } : item);
       }
       return [...prev, { id: product.id, title: product.title, price: product.price, quantity: 1 }];
     });
+  };
+
+  const handleUpdateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      handleRemoveFromCart(productId);
+    } else {
+      setCart(prev => prev.map(item => item.id === productId ? { ...item, quantity: newQuantity } : item));
+    }
   };
 
   const handleRemoveFromCart = (productId) => {
@@ -44,6 +52,17 @@ export default function App() {
 
   const handleClearCart = () => {
     setCart([]);
+  };
+
+  const handleBuyNow = (product) => {
+    setCart((prev) => {
+      const exists = prev.find(item => item.id === product.id);
+      if (exists) {
+        return prev;
+      }
+      return [...prev, { id: product.id, title: product.title, price: product.price, quantity: 1 }];
+    });
+    setActiveTab('checkout');
   };
 
   const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -56,7 +75,7 @@ export default function App() {
           user={user} 
           onOpenProfile={() => setShowProfileModal(true)} 
           cartCount={cartCount}
-          onOpenCheckout={() => setActiveTab('shop')}
+          onOpenCheckout={() => setActiveTab('checkout')}
           onOpenAuth={() => setShowAuthModal(true)}
         />
 
@@ -83,13 +102,30 @@ export default function App() {
               onAddToCart={handleAddToCart}
               onRemoveFromCart={handleRemoveFromCart}
               onClearCart={handleClearCart}
+              onNavigateToCheckout={(product) => {
+                if (product) handleBuyNow(product);
+                else setActiveTab('checkout');
+              }}
+            />
+          )}
+
+          {activeTab === 'checkout' && (
+            <CheckoutView 
+              cart={cart}
+              user={user}
+              onAddToCart={handleAddToCart}
+              onRemoveFromCart={handleRemoveFromCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onClearCart={handleClearCart}
+              onBackToShop={() => setActiveTab('shop')}
+              onNavigateToPlay={() => setActiveTab('play')}
             />
           )}
         </main>
 
         {/* Bottom Nav inside iPhone screen - Anchored permanently at bottom */}
         <BottomNav 
-          activeTab={activeTab} 
+          activeTab={activeTab === 'checkout' ? 'shop' : activeTab} 
           onSelectTab={setActiveTab} 
           cartCount={cartCount}
         />

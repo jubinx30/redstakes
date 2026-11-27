@@ -16,12 +16,19 @@ import {
   Sparkles,
   PhoneCall,
   Clock,
-  MapPin
+  MapPin,
+  Zap
 } from 'lucide-react';
 import Badge from '../shared/Badge';
 import { PRODUCTS } from '../../data/mockData';
 
-export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onClearCart }) {
+export default function ProShopView({ 
+  cart, 
+  onAddToCart, 
+  onRemoveFromCart, 
+  onClearCart,
+  onNavigateToCheckout 
+}) {
   const [activeCategory, setActiveCategory] = useState('ALL SYSTEMS');
   const [copiedPromo, setCopiedPromo] = useState(false);
   const [consultationModal, setConsultationModal] = useState(false);
@@ -134,7 +141,10 @@ export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onCle
             </div>
           </div>
           <button
-            onClick={() => setCheckoutModal(true)}
+            onClick={() => {
+              if (onNavigateToCheckout) onNavigateToCheckout();
+              else setCheckoutModal(true);
+            }}
             className="py-2 px-3 rounded-xl bg-[#f61919] hover:bg-[#ff3b30] text-white font-display font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(246,25,25,0.4)] active:scale-95 transition-all cursor-pointer"
           >
             <span>CHECKOUT</span>
@@ -212,33 +222,50 @@ export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onCle
                   ))}
                 </div>
 
-                {/* CTAs */}
+                {/* CTAs: Buy Now & Add to Bag */}
                 <div className="space-y-2 pt-2">
                   <button
                     onClick={() => {
-                      if (isItemInCart) {
-                        onRemoveFromCart(product.id);
+                      if (onNavigateToCheckout) {
+                        onNavigateToCheckout(product);
                       } else {
                         onAddToCart(product);
                       }
                     }}
-                    className={`w-full py-3.5 px-4 rounded-xl font-display font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg active:scale-[0.98] ${
-                      isItemInCart
-                        ? 'bg-[#10b981] text-[#0a0e16] shadow-[0_0_16px_rgba(16,185,129,0.4)]'
-                        : 'bg-[#f61919] hover:bg-[#ff3b30] text-white shadow-[0_0_20px_rgba(246,25,25,0.4)]'
-                    }`}
+                    className="w-full py-3 px-4 rounded-xl font-display font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg active:scale-[0.98] bg-gradient-to-r from-[#f61919] via-[#e61414] to-[#cc0000] hover:from-[#ff3b30] hover:to-[#f61919] text-white shadow-[0_0_20px_rgba(246,25,25,0.4)]"
                   >
-                    <ShoppingBag className="w-4 h-4" />
-                    {isItemInCart ? 'ITEM IN CART • REMOVE' : `ADD TO CART • $${product.price.toLocaleString()}`}
+                    <Zap className="w-3.5 h-3.5 fill-current" />
+                    <span>BUY NOW • ${product.price.toLocaleString()}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
-                  <button
-                    onClick={() => setConsultationModal(true)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#1b222d] hover:bg-[#242c3a] border border-white/10 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                    SCHEDULE 30-MIN CONSULTATION
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        if (isItemInCart) {
+                          onRemoveFromCart(product.id);
+                        } else {
+                          onAddToCart(product);
+                        }
+                      }}
+                      className={`py-2 px-3 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                        isItemInCart
+                          ? 'bg-[#10b981]/20 border-[#10b981]/50 text-emerald-400'
+                          : 'bg-[#181c24] hover:bg-[#222733] border-white/10 text-gray-300'
+                      }`}
+                    >
+                      <ShoppingBag className="w-3 h-3" />
+                      <span>{isItemInCart ? 'IN BAG • REMOVE' : 'ADD TO BAG'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setConsultationModal(true)}
+                      className="py-2 px-3 rounded-xl bg-[#181c24] hover:bg-[#222733] border border-white/10 text-gray-300 font-mono text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Calendar className="w-3 h-3 text-amber-400" />
+                      <span>CONSULTATION</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -338,7 +365,10 @@ export default function ProShopView({ cart, onAddToCart, onRemoveFromCart, onCle
           </div>
 
           <button
-            onClick={() => setCheckoutModal(true)}
+            onClick={() => {
+              if (onNavigateToCheckout) onNavigateToCheckout();
+              else setCheckoutModal(true);
+            }}
             className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#f61919] to-[#d61313] hover:from-[#ff3b30] hover:to-[#f61919] text-white font-display font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(246,25,25,0.45)] active:scale-[0.98] transition-all cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4" />
